@@ -17,7 +17,7 @@ pip3 install requests
 添加定时任务（每天自动运行）：
 
 这里以linux系统的crontab为例，这里来一个crontab的配置demo:
-terminal运行 crontab -e编辑任务，如下：
+terminal运行 `crontab -e`编辑任务，如下：
 ```
 SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
@@ -47,37 +47,18 @@ crontab /etc/crontab
 
 ```
 {
-	"username": "1901xxxxxx", // 学号
-	"password": "xxxxxxxxxx", // 校园门户密码
-	"gate": "燕园大厦门",     // 终点门（默认从校外到燕园（感觉这个方向影响不大））
-	"email": "xxxxxx@pku.edu.cn", // 邮箱
-	"phone": "xxxxxxxx",      // 手机号
-	"reason": "科研",         // 出入校事由：就业、学业、科研、就医、寒假离校返乡，五选一别写错了
-	"street": "中关村街道",   // 所在的街道，脚本默认海淀区，要改的自己抓包改
-	"route": "中关村-燕园大厦", // 行动轨迹
-	"desc": "去实验室",       // 出入校具体事项
-	"file": "./bjjkb.jpg",    // 证明材料
-	"file_type": 1,           // 证明文件类型：健康宝写1，导师同意书写2，建议搞一个导师同意书因为健康宝【可能】要每天截图
-	"wechat_key": "xxxxxxxxxxxxxxxxx"  //  微信推送key，在 http://sc.ftqq.com/3.version 获取，可以没有
+	"username": "1901xxxxxx",    // 学号
+	"password": "xxxxxxxxxx",    // 校园门户密码
+	"gate": "燕园大厦门",        // 终点门（默认从校外到燕园（感觉这个方向影响不大））
+	"email": "xxxxxx@pku.edu.cn",// 邮箱
+	"phone": "xxxxxxxx",      	 // 手机号
+	"reason": "科研",         	 // 出入校事由：就业、学业、科研、就医、寒假离校返乡，五选一别写错了
+	"street": "中关村街道",   	 // 所在的街道，脚本默认海淀区，要改的自己抓包改
+	"route": "中关村-燕园大厦",  // 行动轨迹
+	"desc": "去实验室",      	 // 出入校具体事项
+	"file": "./bjjkb.jpg",    	 // 证明材料
+	"file_type": 1,              // 证明文件类型：健康宝写1，导师同意书写2，建议搞一个导师同意书
+								 //	因为健康宝【可能】要每天截图
+	"wechat_key": "xxxxxxxxxx"   //  微信推送key，在 http://sc.ftqq.com/3.version 获取，可以没有
 }
 ```
-
-example:
-
-```json
-{
-	"username": "1901xxxxxx",
-	"password": "xxxxxxxxxx",
-	"gate": "燕园大厦门",
-	"email": "xxxxxx@pku.edu.cn",
-	"phone": "xxxxxxxx",
-	"reason": "科研",
-	"street": "中关村街道",
-	"route": "中关村-燕园大厦",
-	"desc": "去实验室",
-	"file": "./bjjkb.jpg",
-	"file_type": 1,
-	"wechat_key": "xxxxxxxxxxxxxxxxx"
-}
-```
-
