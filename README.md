@@ -51,14 +51,14 @@ crontab /etc/crontab
 	"password": "xxxxxxxxxx",    // 校园门户密码
 	"gate": "燕园大厦门",        // 终点门（默认从校外到燕园（感觉这个方向影响不大））
 	"email": "xxxxxx@pku.edu.cn",// 邮箱
-	"phone": "xxxxxxxx",      	 // 手机号
-	"reason": "科研",         	 // 出入校事由：就业、学业、科研、就医、寒假离校返乡，五选一别写错了
-	"street": "中关村街道",   	 // 所在的街道，脚本默认海淀区，要改的自己抓包改
+	"phone": "xxxxxxxx",         // 手机号
+	"reason": "科研",            // 出入校事由：就业、学业、科研、就医、寒假离校返乡，五选一别写错了
+	"street": "中关村街道",   	// 所在的街道，脚本默认海淀区，要改的自己抓包改
 	"route": "中关村-燕园大厦",  // 行动轨迹
 	"desc": "去实验室",      	 // 出入校具体事项
-	"file": "./bjjkb.jpg",    	 // 证明材料
+	"file": "./bjjkb.jpg",       // 证明材料
 	"file_type": 1,              // 证明文件类型：健康宝写1，导师同意书写2，建议搞一个导师同意书
-								 //	因为健康宝【可能】要每天截图
+				     //	因为健康宝【可能】要每天截图
 	"wechat_key": "xxxxxxxxxx"   //  微信推送key，在 http://sc.ftqq.com/3.version 获取，可以没有
 }
 ```
