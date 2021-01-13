@@ -1,31 +1,35 @@
 import requests
-import os
 import json
 import re
 import datetime
-import argparse
 
-USERNAME = os.getenv("PKU_USERNAME")
-PASSWORD = os.getenv("PKU_PASSWORD")
+# 导入用户信息
+with open('config.json', 'r', encoding='UTF-8') as f:
+    config_data = json.load(f)
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
+    "Origin": "https://iaaa.pku.edu.cn"
+}
 
 BASIC = {
     "sqbh":"",
-    "crxqd":"燕园",
-    "crxzd":"校外",
-    "qdxm":"",
-    "zdxm":"",
+    "crxqd":"校外",
+    "crxzd":"燕园",
+    "qdxm": "",
+    "zdxm": config_data["gate"],
     "crxrq":"",
-    "email":"",
-    "lxdh":"",
-    "crxsy":"",
-    "crxjtsx":"",
+    "email": config_data["email"],
+    "lxdh": config_data["phone"],
+    "crxsy": config_data["reason"],
+    "crxjtsx": config_data["desc"],
     "gjdqm":"156",
     "ssdm":"11",
     "djsm":"01",
     "xjsm":"08",
-    "jd":"",
+    "jd": config_data["street"],
     "bcsm":"无",
-    "crxxdgj":"",
+    "crxxdgj": config_data["route"],
     "dfx14qrbz":"y",
     "sfyxtycj":"",
     "tjbz":"",
@@ -33,10 +37,8 @@ BASIC = {
     "shyj":""
 }
 
-headers={
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
-    "Origin": "https://iaaa.pku.edu.cn"
-}
+wechat_key = config_data["wechat_key"]
+
 
 LOG = "```"
 def log(s):
@@ -59,8 +61,8 @@ def finish_log():
 def oauth_login(sess):
     post_data = {
         "appid": "portal2017",
-        "userName": USERNAME,
-        "password": PASSWORD,
+        "userName": config_data["username"],
+        "password": config_data["password"],
         "redirUrl": "https://portal.pku.edu.cn/portal2017/ssoLogin.do"
     }
     login_url = "https://iaaa.pku.edu.cn/iaaa/oauthlogin.do"
@@ -81,7 +83,7 @@ def getSimsoToken(sess):
     if len(found) != 1:
         fail("Fail in getSimsoToken: no token in `Location`", resp.headers['Location'])
     return found[0]
-
+ 
 def simsoLogin(sess, token):
     url = f"https://simso.pku.edu.cn/ssapi/simsoLogin?token={token}"
     resp = sess.get(url, headers=headers)
@@ -96,7 +98,6 @@ def get_curr_application(sess, sid):
     j = json.loads(resp.text)
     if not j["success"]:
         fail("Fail in get_curr_application", resp.text)
-    logv("curr application", resp.text)
     return j
 
 def check_new_application(sess, sid):
@@ -108,11 +109,12 @@ def save_application(sess, sid, application_id):
     application_data = BASIC
     if application_id:
         application_data["sqbh"] = application_id
+    print(application_data)
     resp = sess.post(url, json=application_data, headers=headers)
     j = json.loads(resp.text)
     if not j["success"]:
         fail("Fail in save_application", resp.text)
-
+    
 def remove_file(sess, sid, application_id):
     url1 = f"https://simso.pku.edu.cn/ssapi/stuaffair/epiApply/getZmclxx?sid={sid}&sqbh={application_id}"
     imgs = json.loads(sess.get(url1, headers=headers).text)
@@ -133,6 +135,7 @@ def upload_file(sess, file_type, file_path, sid, application_id):
     if not j["success"]:
         fail("Fail in upload_file", resp.text)
 
+
 def submit(sess, sid, application_id):
     url = f"https://simso.pku.edu.cn/ssapi/stuaffair/epiApply/submitSqxx?sid={sid}&sqbh={application_id}"
     resp = sess.get(url, headers=headers)
@@ -150,7 +153,7 @@ def wechat_push(key, title, message):
     url = f"https://sc.ftqq.com/{key}.send?text={title}&desp={message}"
     requests.get(url)
 
-def run(wechat_key, file_type, file_path):
+def main():
     title = "备案成功 "
     msg = ""
     try:
@@ -173,12 +176,10 @@ def run(wechat_key, file_type, file_path):
         
         # set data info
         BASIC["crxrq"] = curr_application["row"]["defaultCrxrq"]
-        logv("application time", BASIC["crxrq"])
 
         application_id = ""
         if "lastSqxx" in curr_application["row"]:
-            if curr_application["row"]["lastSqxx"]["crxrq"] == BASIC["crxrq"]:
-                application_id = curr_application["row"]["lastSqxx"]["sqbh"]
+            application_id = curr_application["row"]["lastSqxx"]["sqbh"]
         save_application(sess, sid, application_id)
 
         # get application id
@@ -189,13 +190,15 @@ def run(wechat_key, file_type, file_path):
         logv("application_id", application_id)
 
         # upload pic
+        file_type = "dstys"
+        if str(config_data["file_type"]) == '1':
+            file_type = "bjjkb"
+        file_path = config_data["file"]
         remove_file(sess, sid, application_id)
         upload_file(sess, file_type, file_path, sid, application_id)
 
         # submit
-        submit(sess, sid, application_id)
-
-        log("备案成功")
+        # submit(sess, sid, application_id)
 
         # logout
         logout(sess, sid)
@@ -209,48 +212,7 @@ def run(wechat_key, file_type, file_path):
     if wechat_key:
         wechat_push(wechat_key, title, msg)
 
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description='自动出入校备案',
-        epilog=f"""Add environment variable before you use!
-        PKU_USERNAME=学号 PKU_PASSWORD=密码 python3 {__file__} balabala"""
-    )
-    parser.add_argument('--gate', dest='gate', action='store', required=True,
-                        help='从哪里进校，如东南门，不知道门叫什么哪个上去看一眼')
-    parser.add_argument('--email', dest='email', action='store', required=True,
-                        help='邮箱')
-    parser.add_argument('--phone', dest='phone', action='store', required=True,
-                        help='电话')
-    parser.add_argument('--reason', dest='reason', action='store', required=True,
-                        help='出入校事由：就业、学业、科研、就医、寒假离校返乡，五选一别写错了')
-    parser.add_argument('--desc', dest='desc', action='store', required=True,
-                        help='出入校具体事项')
-    parser.add_argument('--street', dest='street', action='store', required=True,
-                        help='要去的街道，脚本默认海淀区，要改的自己抓包改')
-    parser.add_argument('--route', dest='route', action='store', required=True,
-                        help='行动轨迹')
-    parser.add_argument('--file', dest="file", action='store', required=True,
-                        help='证明文件')
-    parser.add_argument('--file-type', dest="file_type", action='store', required=True,
-                        help='证明文件类型：健康宝写1，导师同意书写2，建议搞一个导师同意书因为健康宝【可能】要每天截图')
-    parser.add_argument('--wechat-key', dest='wechat_key', action='store',
-                        help='微信推送key，在 http://sc.ftqq.com/3.version 获取，可以妹有')
-    args = parser.parse_args()
-    
-    BASIC["qdxm"] = args.gate
-    BASIC["email"] = args.email
-    BASIC["lxdh"] = args.phone
-    BASIC["crxsy"] = args.reason
-    BASIC["crxjtsx"] = args.desc
-    BASIC["jd"] = args.street
-    BASIC["crxxdgj"] = args.route
-    wechat_key = args.wechat_key
-
-    file_type = "dstys"
-    if str(args.file_type) == '1':
-        file_type = "bjjkb"
-    file_path = args.file
-
-    run(wechat_key, file_type,file_path)
+    main()
+    finish_log()
     print(LOG)
