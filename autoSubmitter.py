@@ -199,7 +199,7 @@ def main():
         upload_file(sess, file_type, file_path, sid, application_id)
 
         # submit
-        # submit(sess, sid, application_id)
+        submit(sess, sid, application_id)
 
         # logout
         logout(sess, sid)
