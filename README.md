@@ -13,6 +13,12 @@ pip3 install requests
 ➜ python3 autoSubmitter.py
 
 ```
+检查备案状态：
+
+```
+➜ python3 autoQuery.py
+
+```
 
 添加定时任务（每天自动运行）：
 
@@ -34,7 +40,8 @@ MAILTO=root
 # |  |  |  |  |
 # *  *  *  *  * user-name  command to be executed
 
-0  7  *  *  * cd /root/pkubeian && ./start.sh  # 即每天早上7点运行, 项目目录为/root/pkubeian，root身份运行，如果start.sh权限不够，请chmod +x start.sh
+0  7  *  *  * cd /root/pkubeian && ./submit.sh  # 即每天早上7点运行, 自动提交备案申请，项目目录为/root/pkubeian，root身份运行，如果submit.sh权限不够，请chmod +x submit.sh
+0  16  *  *  * cd /root/pkubeian && ./query.sh  # 即每天下午4点运行, 自动检查备案是否审核，项目目录为/root/pkubeian，root身份运行，如果query.sh权限不够，请chmod +x query.sh
 ```
 
 然后加载任务

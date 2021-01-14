@@ -154,7 +154,7 @@ def wechat_push(key, title, message):
     requests.get(url)
 
 def main():
-    title = "备案成功 "
+    title = "备案提交成功 "
     msg = ""
     try:
         sess = requests.Session()
@@ -204,7 +204,7 @@ def main():
         # logout
         logout(sess, sid)
     except Exception as e:
-        title = "备案失败"
+        title = "备案提交失败"
         log(str(e))
     
     title += datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %f")
