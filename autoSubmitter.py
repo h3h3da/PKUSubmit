@@ -14,10 +14,10 @@ headers = {
 
 BASIC = {
     "sqbh":"",
-    "crxqd":"校外",
-    "crxzd":"燕园",
-    "qdxm": "",
-    "zdxm": config_data["gate"],
+    "crxqd":"燕园",
+    "crxzd":"校外",
+    "qdxm": config_data["gate"],
+    "zdxm": "",
     "crxrq":"",
     "email": config_data["email"],
     "lxdh": config_data["phone"],
@@ -179,7 +179,8 @@ def main():
 
         application_id = ""
         if "lastSqxx" in curr_application["row"]:
-            application_id = curr_application["row"]["lastSqxx"]["sqbh"]
+            if curr_application["row"]["lastSqxx"]["crxrq"] == BASIC["crxrq"]:
+                application_id = curr_application["row"]["lastSqxx"]["sqbh"]
         save_application(sess, sid, application_id)
 
         # get application id

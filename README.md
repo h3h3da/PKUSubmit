@@ -49,7 +49,7 @@ crontab /etc/crontab
 {
 	"username": "1901xxxxxx",    // 学号
 	"password": "xxxxxxxxxx",    // 校园门户密码
-	"gate": "燕园大厦门",        // 终点门（默认从校外到燕园（感觉这个方向影响不大））
+	"gate": "燕园大厦门",        // 起点门
 	"email": "xxxxxx@pku.edu.cn",// 邮箱
 	"phone": "xxxxxxxx",         // 手机号
 	"reason": "科研",            // 出入校事由：就业、学业、科研、就医、寒假离校返乡，五选一别写错了
@@ -62,3 +62,4 @@ crontab /etc/crontab
 	"wechat_key": "xxxxxxxxxx"   //  微信推送key，在 http://sc.ftqq.com/3.version 获取，可以没有
 }
 ```
+注意：默认从校内到校外，因为从校外到校内不能使用导师同意书，校外返校必须上传”北京健康宝“截图！使用时请注意！
