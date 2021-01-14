@@ -108,7 +108,7 @@ def main():
         if "lastSqxx" in curr_application["row"]:
             if curr_application["row"]["lastSqxx"]["crxrq"] == crxrq:
                 title = curr_application["row"]["lastSqxx"]["shbz"]
-                logv("Application Status", title)
+                logv("Application Status", curr_application["row"]["lastSqxx"])
 
         # logout
         logout(sess, sid)
