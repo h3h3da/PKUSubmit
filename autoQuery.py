@@ -67,12 +67,21 @@ def simsoLogin(sess, token):
         fail("Fail in simsoLogin", resp.text)
     return j
 
-def status_query(sess, sid):
+def get_default_crxrq(sess, sid):
     url = f"https://simso.pku.edu.cn/ssapi/stuaffair/epiApply/getSqzt?sid={sid}"
     resp = sess.get(url, headers=headers)
     j = json.loads(resp.text)
     if not j["success"]:
-        fail("Fail in get_curr_application", resp.text)
+        fail("Fail in get_default_crxrq", resp.text)
+    print("j: ", j)
+    return j["row"]["defaultCrxrq"]
+
+def status_query(sess, sid):
+    url = f"https://simso.pku.edu.cn/ssapi/stuaffair/epiApply/getSqxxHis?sid={sid}&pageNum=1"
+    resp = sess.get(url, headers=headers)
+    j = json.loads(resp.text)
+    if not j["success"]:
+        fail("Fail in status_query", resp.text)
     return j
 
 def logout(sess, sid):
@@ -87,6 +96,7 @@ def wechat_push(key, title, message):
 
 def main():
     msg = ""
+    title = ""
     try:
         sess = requests.Session()
 
@@ -102,13 +112,13 @@ def main():
         sess.cookies.set("sid", simso_meta["sid"], domain="pku.edu.cn")
 
         # initialize application
+        default_crxrq = get_default_crxrq(sess, sid)
         curr_application = status_query(sess, sid)
         print(curr_application)
-        crxrq = curr_application["row"]["defaultCrxrq"]
-        if "lastSqxx" in curr_application["row"]:
-            if curr_application["row"]["lastSqxx"]["crxrq"] == crxrq:
-                title = curr_application["row"]["lastSqxx"]["shbz"]
-                logv("Application Status", curr_application["row"]["lastSqxx"])
+        crxrq = curr_application["row"][0]["crxrq"]
+        if default_crxrq == crxrq:
+            title = curr_application["row"][0]["shbz"]
+            logv("Application Status", curr_application["row"][0])
 
         # logout
         logout(sess, sid)

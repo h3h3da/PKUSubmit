@@ -9,6 +9,9 @@
 	"route": "中关村-燕园大厦",
 	"desc": "去实验室",
 	"file": "./dstys.jpg",
-	"file_type": 2,
+	"file_type": 2
+	"ssyq": "无宿舍",
+	"ssl": "",
+	"ssfjh": "",,
 	"wechat_key": "xxxxxxxxxxxxxxxxx"
 }

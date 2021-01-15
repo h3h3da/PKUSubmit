@@ -34,7 +34,12 @@ BASIC = {
     "sfyxtycj":"",
     "tjbz":"",
     "shbz":"",
-    "shyj":""
+    "shyj":"",
+    "ssyq": config_data["ssyq"],
+    "ssl": config_data["ssl"],
+    "ssfjh": config_data["ssfjh"],
+    "yddh": config_data["phone"],
+    "dzyx": config_data["email"]
 }
 
 wechat_key = config_data["wechat_key"]
@@ -100,6 +105,14 @@ def get_curr_application(sess, sid):
         fail("Fail in get_curr_application", resp.text)
     return j
 
+def status_query(sess, sid):
+    url = f"https://simso.pku.edu.cn/ssapi/stuaffair/epiApply/getSqxxHis?sid={sid}&pageNum=1"
+    resp = sess.get(url, headers=headers)
+    j = json.loads(resp.text)
+    if not j["success"]:
+        fail("Fail in status_query", resp.text)
+    return j
+
 def check_new_application(sess, sid):
     url = f"https://simso.pku.edu.cn/ssapi/stuaffair/epiApply/newApplyCheck?sid={sid}"
     resp = sess.get(url, headers=headers)
@@ -113,7 +126,10 @@ def save_application(sess, sid, application_id):
     resp = sess.post(url, json=application_data, headers=headers)
     j = json.loads(resp.text)
     if not j["success"]:
-        fail("Fail in save_application", resp.text)
+        if re.match("已存在\d{8}的出入校申请记录，不能再次申请！", j["msg"]):
+            pass
+        else:
+            fail("Fail in save_application", resp.text)
     
 def remove_file(sess, sid, application_id):
     url1 = f"https://simso.pku.edu.cn/ssapi/stuaffair/epiApply/getZmclxx?sid={sid}&sqbh={application_id}"
@@ -181,13 +197,21 @@ def main():
         if "lastSqxx" in curr_application["row"]:
             if curr_application["row"]["lastSqxx"]["crxrq"] == BASIC["crxrq"]:
                 application_id = curr_application["row"]["lastSqxx"]["sqbh"]
+        else: # 之前的接口不能用了
+            get_status = status_query(sess, sid)
+            crxrq = get_status["row"][0]["crxrq"]
+            if curr_application["row"]["defaultCrxrq"] == crxrq:
+                application_id = get_status["row"][0]["sqbh"]
+        print("appid: ", application_id)
         save_application(sess, sid, application_id)
 
+        '''
         # get application id
-        curr_application = get_curr_application(sess, sid)
+        curr_applicationcurr_application = get_curr_application(sess, sid)
         if "lastSqxx" not in curr_application["row"]:
             fail("Cannot find lastSqxx", json.dumps(curr_application))
         application_id = curr_application["row"]["lastSqxx"]["sqbh"]
+        '''
         logv("application_id", application_id)
 
         # upload pic
